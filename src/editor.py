@@ -14,7 +14,7 @@ def save_last_opened_directory(directory):
 
 def open_last_opened_directory():
     """Opens the last opened directory from the config file."""
-    config_file = "config.txt"
+    config_file = "headercommenter-config.txt"
     if os.path.exists(config_file):
         with open(config_file, "r") as file:
             directory = file.read()
@@ -551,13 +551,13 @@ menu.add_command(label="Quit", command=root.quit)
 root.bind('<Control-q>', lambda e: root.quit())
 
 # Bind Ctrl+O to open file
-root.bind('<Control-o>', lambda e: open_file(filedialog.askopenfilename()))
+root.bind('<Control-o>', lambda e: open_file(filedialog.askopenfilename))
 
 # Bind Ctrl+S to save
 root.bind('<Control-s>', save_file_with_shortcut)
 
 # Bind Enter key to update header preview
-root.bind('<Return>', lambda e: header_form.update_header_text())
+root.bind('<Return>', lambda e: header_form.update_header_text)
 
 # try to open the last opened directory
 open_last_opened_directory()
