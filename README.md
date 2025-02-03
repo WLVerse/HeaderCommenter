@@ -18,7 +18,6 @@ This is currently designed specifically for DigiPen students. More customization
 - Enjoy!
 
 ## Supported keybinds
-- [Enter] Update Header Preview
 - [Ctrl + O] Open directory
 - [Ctrl + S] Save currently open file
 - [Ctrl + Q] Quit application (will not save)

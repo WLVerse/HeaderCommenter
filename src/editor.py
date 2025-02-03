@@ -104,39 +104,6 @@ def create_header_template(filename=""):
 // Copyright (c) {current_year} DigiPen, All rights reserved.
 """
 
-def wrap_text(text, width=80):
-    """Wraps description text at specified width while ensuring all lines are comments."""
-    lines = text.split('\n')
-    wrapped_lines = []
-    
-    current_line = ''
-    
-    for line in lines:
-        stripped_line = line.lstrip()
-        leading_spaces = line[:len(line) - len(stripped_line)]  # Preserve indentation
-        
-        # Check if the line is a comment (starts with `//`) or plain text
-        if stripped_line.startswith('//'):
-            content = stripped_line[2:].strip()  # Remove `//`
-        else:
-            content = stripped_line.strip()  # Treat it as a comment even if `//` is missing
-        
-        if content:
-            words = content.split()
-            for word in words:
-                if len(current_line) + len(word) + 1 <= width - len(leading_spaces) - 3:  # -3 for "// "
-                    current_line += (word + ' ')
-                else:
-                    wrapped_lines.append(f"{leading_spaces}// {current_line.strip()}")
-                    current_line = word + ' '
-            if current_line:
-                wrapped_lines.append(f"{leading_spaces}// {current_line.strip()}")
-                current_line = ''
-        else:
-            wrapped_lines.append(leading_spaces + "//")  # Preserve empty comment lines
-    
-    return '\n'.join(wrapped_lines)
-
 def open_file(filepath):
     """Opens the selected file in the text editor."""
     try:
@@ -161,12 +128,16 @@ def open_file(filepath):
             parse_header_to_form(header)
             
             # Update header preview
+            header_text.config(state="normal")
             header_text.delete("1.0", tk.END)
             header_text.insert(tk.END, header)
+            header_text.config(state="disabled")
             
             # Update code area
+            code_area.config(state="normal")
             code_area.delete("1.0", tk.END)
             code_area.insert(tk.END, code)
+            code_area.config(state="disabled")
             
         root.title(f"Text Editor - {filepath}")
         root.current_file = filepath
@@ -187,14 +158,13 @@ def parse_header_to_form(header):
     author_count = 1
     current_author = None
     contribution_points_count = 0
-    temp_description = ""  # Temporary storage for joining wrapped sentences
     
     for i, line in enumerate(lines):
         line = line.strip()
         if not line.startswith('//'):
             continue
             
-        # Remove comment marker and trim
+        raw_content = line[3:] if line.startswith('// ') else line[2:]
         content = line[2:].strip()
         
         # Parse team and website from first line
@@ -220,20 +190,11 @@ def parse_header_to_form(header):
                 description_lines.pop()  # Remove extra empty line
             continue
         
-        # Collect description lines (joining wrapped sentences)
+        # Collect description lines including empty lines and preserve indentation
         if description_start and not description_end:
-            if temp_description:
-                if temp_description[-1] in ".!?":
-                    # If previous sentence ended properly, start a new one
-                    description_lines.append(temp_description.strip())
-                    temp_description = content
-                else:
-                    # Otherwise, join it with the next line
-                    temp_description += " " + content
-            else:
-                temp_description = content
+            description_lines.append(raw_content)
             continue
-        
+
         # Parse authors
         if content.startswith('['):
             try:
@@ -285,16 +246,17 @@ def parse_header_to_form(header):
     if description_lines:
         header_form.description.insert("1.0", '\n'.join(description_lines))
 
-def save_file_with_shortcut(event=None):
+def save_file(event=None):
     """Saves the content directly to the current file."""
     if hasattr(root, 'current_file'):
         try:
+            # Update the header text to ensure it's up to date
+            header_form.update_header_text()
+
             # Combine header and code with a newline in between
             header_content = header_text.get("1.0", "end-1c")
             code_content = code_area.get("1.0", "end-1c")
             content = f"{header_content}\n\n{code_content}"
-
-            # Update the header text to ensure it's up to date
             
             with open(root.current_file, "w", encoding="utf-8") as file:
                 file.write(content)
@@ -315,11 +277,6 @@ class HeaderForm(tk.Frame):
         
         # Create form fields
         self.create_form_fields()
-        
-        # Create update button
-        update_btn = tk.Button(self, text="Update Header Preview", command=self.update_header_text,
-                             bg=MENU_COLOR, fg=TEXT_COLOR)
-        update_btn.pack(pady=5)
 
     def create_form_fields(self):
         # Team Info
@@ -462,11 +419,37 @@ class HeaderForm(tk.Frame):
       header += "//\n"
       
       # Add description (wrap at 80 chars)
-      desc_text = self.description.get("1.0", tk.END).strip()
-      if desc_text:
-          # Use the wrap_text function to properly format description
-          wrapped_desc = wrap_text(desc_text)
-          header += wrapped_desc + "\n"
+      desc_text = self.description.get("1.0", tk.END)
+      wrapped_lines = []
+
+      # Parse by line
+      for line in desc_text.split('\n'):
+          # Split line into words
+          words = line.split()
+          current_line = ""
+
+          # Get the characters before the first non-space character
+          prefix = line[:len(line) - len(line.lstrip())]
+
+          for word in words:
+              # Check if adding the word will exceed the 80 char limit
+              if len(current_line) + len(word) + 1 <= 80:
+                  current_line += word + " "
+              else:
+                  # remove the last space
+                  current_line = current_line[:-1]
+                  # Add back the prefix
+                  wrapped_lines.append(prefix + current_line)
+                  current_line = word + " "
+
+          # Add the last line
+          wrapped_lines.append(prefix + current_line)
+
+      if wrapped_lines:
+        wrapped_lines.pop()  # Remove the last empty line
+      # Join all wrapped lines with the comment prefix
+      header += "// " + "\n// ".join(wrapped_lines) + "\n"
+      
       header += "//\n"
       
       # Add authors
@@ -489,8 +472,10 @@ class HeaderForm(tk.Frame):
       header += f"// Copyright (c) {year} DigiPen, All rights reserved."
       
       # Update header text area
+      header_text.config(state="normal")
       header_text.delete("1.0", tk.END)
       header_text.insert("1.0", header)
+      header_text.config(state="disabled")
 
 # GUI Setup
 root = tk.Tk()
@@ -546,7 +531,7 @@ code_area.pack(fill="both", expand=True, padx=5, pady=5)
 menu = tk.Menu(root, bg=MENU_COLOR, fg=TEXT_COLOR, activebackground="#444", activeforeground="white")
 root.config(menu=menu)
 menu.add_command(label="Open Directory", command=lambda: open_directory(filedialog.askdirectory()))
-menu.add_command(label="Save", command=save_file_with_shortcut)
+menu.add_command(label="Save", command=save_file)
 menu.add_command(label="Quit", command=root.quit)
 
 # Bind Ctrl+Q to quit
@@ -556,10 +541,10 @@ root.bind('<Control-q>', lambda e: root.quit())
 root.bind('<Control-o>', lambda e: open_file(filedialog.askopenfilename))
 
 # Bind Ctrl+S to save
-root.bind('<Control-s>', save_file_with_shortcut)
+root.bind('<Control-s>', save_file)
 
-# Bind Enter key to update header preview
-root.bind('<Return>', lambda e: header_form.update_header_text)
+# Bind all key presses to update header preview
+root.bind('<Key>', lambda e: header_form.update_header_text())
 
 # try to open the last opened directory
 open_last_opened_directory()
