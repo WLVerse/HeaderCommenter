@@ -8,11 +8,12 @@ This is currently designed specifically for DigiPen students. More customization
 - Custom GUI to edit each field in the file header.
 - Supports h, hpp, c, cpp, inl files.
 - Reopens the last open directory when opening the app.
+- Autosaving! (Disabled by default)
 
 ## How to use
 - Launch the exe.
 - Open your source repo using [Ctrl + O] or click the "Open directory" button.
-- Browse the file tree on the left for the file you want to edit, double click the file to open it.
+- Browse the file tree on the left for the file you want to edit and click on the file to open it.
 - Edit the text fields on the top third and press [Enter] or click the "Update Header Preview" button.
 - Save the header using [Ctrl + S] or click the "Save" button.
 - Enjoy!

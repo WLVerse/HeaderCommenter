@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import filedialog, messagebox, ttk
+from tkinter import filedialog, messagebox, ttk, Menu
 import os
 from datetime import datetime
 
@@ -531,8 +531,21 @@ code_area.pack(fill="both", expand=True, padx=5, pady=5)
 menu = tk.Menu(root, bg=MENU_COLOR, fg=TEXT_COLOR, activebackground="#444", activeforeground="white")
 root.config(menu=menu)
 menu.add_command(label="Open Directory", command=lambda: open_directory(filedialog.askdirectory()))
+options_menu = Menu(menu, tearoff=0)
+menu.add_cascade(label="Options", menu=options_menu)
 menu.add_command(label="Save", command=save_file)
 menu.add_command(label="Quit", command=root.quit)
+
+# Add a toggle button for auto-saving
+def on_auto_save_toggle():
+    if auto_save_var.get():
+        root.bind('<Key>', save_file)
+    else:
+        root.bind('<Key>', lambda e: header_form.update_header_text())
+
+auto_save_var = tk.BooleanVar(value=False)
+options_menu.add_checkbutton(label="Auto Save", onvalue=True, offvalue=False,
+                             variable=auto_save_var, command=on_auto_save_toggle)
 
 # Bind Ctrl+Q to quit
 root.bind('<Control-q>', lambda e: root.quit())
@@ -544,7 +557,7 @@ root.bind('<Control-o>', lambda e: open_file(filedialog.askopenfilename))
 root.bind('<Control-s>', save_file)
 
 # Bind all key presses to update header preview
-root.bind('<Key>', lambda e: header_form.update_header_text())
+on_auto_save_toggle()
 
 # try to open the last opened directory
 open_last_opened_directory()
