@@ -8,7 +8,7 @@ CPP_EXTENSIONS = {".h", ".hpp", ".c", ".cpp", ".inl"}
 
 def save_last_opened_directory(directory):
     """Saves the last opened directory to the config file."""
-    config_file = "config.txt"
+    config_file = "headercommenter-config.txt"
     with open(config_file, "w") as file:
         file.write(directory)
 
@@ -475,7 +475,7 @@ class HeaderForm(tk.Frame):
           email = author['email'].get().strip()
           
           # Add author line
-          header += f"// [{contrib}%] {name} ({email}@digipen.edu)\n"
+          header += f"// [{contrib}%] {name} ({email}\\@digipen.edu)\n"
           
           # Add contribution points
           for point in author['contribution_points']:
