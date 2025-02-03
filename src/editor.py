@@ -293,11 +293,13 @@ def save_file_with_shortcut(event=None):
             header_content = header_text.get("1.0", "end-1c")
             code_content = code_area.get("1.0", "end-1c")
             content = f"{header_content}\n\n{code_content}"
+
+            # Update the header text to ensure it's up to date
             
             with open(root.current_file, "w", encoding="utf-8") as file:
                 file.write(content)
             
-            messagebox.showinfo("Success", "File saved successfully!")
+            #messagebox.showinfo("Success", "File saved successfully!")
         except Exception as e:
             messagebox.showerror("Error", f"Could not save file:\n{e}")
     else:
