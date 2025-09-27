@@ -1,45 +1,105 @@
 # HeaderCommenter
-A GUI desktop application to quickly edit header comments in a repo.
 
-This is currently designed specifically for DigiPen students. More customization options will be added in the future to generify it.
+A modern, optimized GUI desktop application for managing standardized C++ file headers with template-based variable substitution.
 
-## Features
-- File tree that accurately represents the directory structure.
-- Custom GUI to edit each field in the file header.
-- Supports h, hpp, c, cpp, inl files.
-- Reopens the last open directory when opening the app.
-- Autosaving! (Disabled by default)
+Originally designed for DigiPen students but now features extensive customization options making it suitable for any C++ project requiring consistent header formatting.
 
-## How to use
-- Launch the exe.
-- Open your source repo using [Ctrl + O] or click the "Open directory" button.
-- Browse the file tree on the left for the file you want to edit and click on the file to open it.
-- Edit the text fields on the top third and press [Enter] or click the "Update Header Preview" button.
-- Save the header using [Ctrl + S] or click the "Save" button.
-- Enjoy!
+## ✨ Features
 
-## Supported keybinds
-- [Ctrl + O] Open directory
-- [Ctrl + S] Save currently open file
-- [Ctrl + Q] Quit application (will not save)
+### **Core Functionality**
+- **File Tree** - Hierarchical directory view
+- **Template-Based Headers** - Customizable `.fmt` template files with variable substitution
+- **Live Template Matching** - Real-time detection of existing headers with template validation
+- **Interactive Editing** - Click-to-edit highlighted fields in matched templates
+- **Multi-line Description Support** - Automatic text wrapping based on template width
 
-## Todo list
-- Write your own custom formats
-- Set default values for all editable fields in the header
+### **Advanced Capabilities**
+- **Template Editor** - Built-in editor with live variable detection and syntax highlighting
+- **Metadata Management** - Visual editor for custom variables with type support (Custom, Date, File Name, etc.)
+- **Auto-save Configuration** - Persistent settings with automatic state restoration
+- **Multi-Monitor Support** - Intelligent window positioning across multiple displays
+- **Performance Optimized** - Cached template loading, compiled regex patterns, efficient file I/O
 
-## Default File Header Format
+### **File Support**
+- **Extensions**: `.h`, `.hpp`, `.c`, `.cpp`, `.inl`
+- **Smart Text Wrapping**: Automatic description wrapping based on template line length
+- **Header Validation**: Template matching with support for multiline content
+
+## 🚀 Quick Start
+
+### **Installation**
+1. Download the latest release executable
+2. Launch `HeaderCommenter_<version>.exe`
+3. Configure your template file (Settings → Template File)
+4. Set up metadata variables (Metadata Editor)
+
+### **Basic Usage**
+1. **Open Directory**: File → Open Directory or `Ctrl+O`
+2. **Select File**: Double click any C++ file in the tree view
+3. **Edit Headers**: Click highlighted template fields to edit
+4. **Insert Headers**: Use "Insert Header" for files without headers
+5. **Update Metadata**: Use "Update All Metadata" to refresh existing headers
+
+## 📝 Template System
+
+### **Template Format**
+Templates use `${VARIABLE}` syntax for variable substitution.
+The included `digipen-gam300.fmt` provides a DigiPen-compatible format:
+
 ```cpp
-// Team Name [https://websitelink.web.app]
-// filename.ext
-// 
-// A description of the what the file does.
-//
-// AUTHORS
-// [70%] Full Name (email\@digipen.edu)
-//   - Main Author
-//   - Contributions
-// [30%] Full Name (email\@digipen.edu)
-//   - Contributions
-// 
-// Copyright (c) Year DigiPen, All rights reserved.
+/**
+@file    ${FILENAME}
+@author  ${EMAIL}
+@date    ${CURRENTDATE}
+
+${DESCRIPTION}
+
+Copyright (C) ${CURRENTYEAR} DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the prior
+written consent of DigiPen Institute of Technology is prohibited.
+*/
 ```
+
+### **Custom Variables**
+Create custom variables in the Metadata Editor:
+- **Custom Text**: Static text values
+- **File Name**: Dynamic file name insertion
+- **Date/Year**: Auto-generated date values
+
+## ⌨️ Keyboard Shortcuts
+
+### **Global**
+- `Ctrl+O` - Open directory
+- `Ctrl+Q` - Quit application
+
+### **Template Editor**
+- `Ctrl+S` - Save template (auto-refreshes variables)
+- `Escape` - Close editor
+
+### **Edit Popups**
+- `Enter` - Save changes (single-line fields)
+- `Ctrl+Enter` - Save changes (multiline descriptions)
+- `Escape` - Cancel editing
+
+## 🔧 Building from Source
+
+### **Requirements**
+- Python 3.6+
+- Standard library modules (tkinter, configparser, re, os, etc.)
+
+### **Build Process**
+```bash
+# Clone repository
+git clone <repository-url>
+cd HeaderCommenter
+
+# Run directly
+python src/editor.py
+
+# Build executable (Windows)
+./build.bat
+```
+
+## 📄 License
+
+Licensed under the MIT License. See `LICENSE` file for details.
