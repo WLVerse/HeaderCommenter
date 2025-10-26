@@ -1,5 +1,6 @@
 # Custom gitignore for Python projects
-config.txt
+headercommenter-config.txt
+hc-config.ini
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
