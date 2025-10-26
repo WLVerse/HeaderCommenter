@@ -1603,6 +1603,11 @@ def enable_region_editing(start_pos, end_pos, variable_name):
     def save_edit():
         new_value = get_entry_value()
         
+        # If the user entered an empty value, use [Empty] placeholder instead
+        if not new_value.strip():
+            new_value = "[Empty]"
+            log_message(f"Empty value for {variable_name} converted to [Empty] placeholder")
+        
         # Apply text wrapping for DESCRIPTION fields based on template's maximum line length
         if is_description:
             template_content = get_current_template_content()
@@ -2001,19 +2006,21 @@ def resolve_template_variables(template_content, file_path):
                             var_index = template_vars.index(var_name)
                             if var_index < len(match.groups()):
                                 existing_value = match.groups()[var_index].strip()
-                                # Only preserve non-empty, non-placeholder values
+                                # If there's an existing non-empty, non-placeholder value, preserve it.
+                                # Otherwise, use the explicit placeholder '[Empty]' so inserted
+                                # headers have a visible placeholder instead of being blank.
                                 if existing_value and not (existing_value.startswith('[') and existing_value.endswith(']')):
                                     resolved_value = existing_value  # Preserve existing value
                                 else:
-                                    resolved_value = ""  # Empty for missing/placeholder content
+                                    resolved_value = "[Empty]"
                             else:
-                                resolved_value = ""  # Empty when index out of bounds
+                                resolved_value = "[Empty]"  # Use placeholder when we can't find existing
                         else:
-                            resolved_value = ""  # Empty when variable not found
+                            resolved_value = "[Empty]"  # Use placeholder when variable not found
                     else:
-                        resolved_value = ""  # Empty when pattern doesn't match
+                        resolved_value = "[Empty]"  # Use placeholder when pattern doesn't match
                 except:
-                    resolved_value = ""  # Empty on any error instead of placeholder
+                    resolved_value = "[Empty]"  # Use placeholder on error
             else:
                 # Use default resolution for common variables
                 if var_name == "CURRENTDATE":
